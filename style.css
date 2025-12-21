@@ -162,3 +162,18 @@ body,
 #game-container {
   display: none;           
 }
+
+/* Player name display ovanför spelplanen */
+#player-display {
+  text-align: center;
+  font-size: 24px;
+  color: #f2c14e;
+  margin-bottom: 10px;
+}
+#new-record-msg {
+  text-align: center;
+  font-size: 22px;
+  color: #f2c14e;
+  margin-bottom: 10px;
+  display: none; 
+}

@@ -11,6 +11,9 @@ const startMenu = document.getElementById("start-menu");
 const gameContainer = document.getElementById("game-container");
 const startButton = document.getElementById("start-button");
 const gameModeSelect = document.getElementById("game-mode");
+const playerNameInput = document.getElementById("player-name");
+const playerDisplay = document.getElementById("player-display");
+const newRecordMsg = document.getElementById("new-record-msg");
 
 // Instanser av renderer och spel
 const renderer = new GameRenderer(board, scoreEl, highScoreEl);
@@ -18,6 +21,17 @@ const game = new SnakeGame(20);
 
 let gameInterval = null;
 let gameStarted = false;
+
+// Funktion för att visa nytt rekord-meddelande
+function showNewRecordMessage(playerName) {
+  newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
+  newRecordMsg.style.display = "block";
+
+  // Dölj meddelandet efter 3 sekunder
+  setTimeout(() => {
+    newRecordMsg.style.display = "none";
+  }, 6000);
+}
 
 // Rita spelet (ormen syns bara när spelet startat)
 function draw() {
@@ -34,8 +48,15 @@ function gameLoop() {
   const head = game.move();
 
   if (game.hasCollision(head)) {
+    const previousHighScore = game.highScore; // spara tidigare highscore
     game.updateHighScore();
     renderer.updateHighScore(game.highScore);
+
+    // Om nytt rekord slås
+    if (game.highScore > previousHighScore) {
+      const playerName = playerNameInput.value.trim() || "Player";
+      showNewRecordMessage(playerName);
+    }
 
     stopGame();
     game.reset();
@@ -71,6 +92,9 @@ function stopGame() {
 // När man klickar på Start Game-knappen
 startButton.addEventListener("click", () => {
   if (gameModeSelect.value === "single") {
+    const playerName = playerNameInput.value.trim() || "Player";
+    playerDisplay.textContent = playerName; // Visa namn ovanför spelplanen
+
     startMenu.style.display = "none";      // Dölj startmenyn
     gameContainer.style.display = "block"; // Visa spelplanen
     instructionText.textContent = "Press spacebar to start the game"; // Visa instruktion
