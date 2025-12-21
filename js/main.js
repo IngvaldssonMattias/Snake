@@ -1,13 +1,16 @@
 import { GameRenderer } from "./component/component.js";
 import { SnakeGame } from "./service/service.js";
 
-
 // HTML-element
 const board = document.getElementById("game-board");
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("highScore");
 const instructionText = document.getElementById("instruction-text");
 const logo = document.getElementById("snake-logo");
+const startMenu = document.getElementById("start-menu");
+const gameContainer = document.getElementById("game-container");
+const startButton = document.getElementById("start-button");
+const gameModeSelect = document.getElementById("game-mode");
 
 // Instanser av renderer och spel
 const renderer = new GameRenderer(board, scoreEl, highScoreEl);
@@ -31,7 +34,6 @@ function gameLoop() {
   const head = game.move();
 
   if (game.hasCollision(head)) {
-    // Uppdatera rekord
     game.updateHighScore();
     renderer.updateHighScore(game.highScore);
 
@@ -48,13 +50,12 @@ function gameLoop() {
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
 
-// Starta spelet
-function startGame() {
+// Starta själva spelet (första gången ormen rör sig)
+function beginPlaying() {
   gameStarted = true;
   instructionText.style.display = "none";
   logo.style.display = "none";
-
-  draw(); // Rita ormen direkt vid start
+  draw();
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
 
@@ -64,24 +65,37 @@ function stopGame() {
   gameStarted = false;
   instructionText.style.display = "block";
   logo.style.display = "block";
-
-  draw(); // Rensa ormen från brädet vid stopp
+  draw();
 }
+
+// När man klickar på Start Game-knappen
+startButton.addEventListener("click", () => {
+  if (gameModeSelect.value === "single") {
+    startMenu.style.display = "none";      // Dölj startmenyn
+    gameContainer.style.display = "block"; // Visa spelplanen
+    instructionText.textContent = "Press spacebar to start the game"; // Visa instruktion
+    instructionText.style.display = "block";
+    logo.style.display = "block";
+  } else {
+    alert("Multiplayer är inte implementerat än.");
+  }
+});
 
 // Lyssna på tangenttryck
 document.addEventListener("keydown", e => {
   if (!gameStarted && (e.code === "Space" || e.key === " ")) {
-    startGame();
+    beginPlaying(); // Starta spelet först när space trycks
     return;
   }
 
+  // Riktning (förhindra 180°-vändning)
   switch (e.key) {
-    case "ArrowUp": game.direction = "up"; break;
-    case "ArrowDown": game.direction = "down"; break;
-    case "ArrowLeft": game.direction = "left"; break;
-    case "ArrowRight": game.direction = "right"; break;
+    case "ArrowUp": if (game.direction !== "down") game.direction = "up"; break;
+    case "ArrowDown": if (game.direction !== "up") game.direction = "down"; break;
+    case "ArrowLeft": if (game.direction !== "right") game.direction = "left"; break;
+    case "ArrowRight": if (game.direction !== "left") game.direction = "right"; break;
   }
 });
 
-// Rita bara startskärm utan ormen
+// Visa highscore direkt när sidan laddas
 renderer.updateHighScore(game.highScore);

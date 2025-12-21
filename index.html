@@ -15,6 +15,32 @@
     <script type="module" src="./js/main.js" defer></script>
   </head>
   <body>
+
+ <div id="start-menu">
+    <div class="menu-container">
+      <h1>Snake Game</h1>
+      
+      <input type="text" id="player-name" placeholder="Enter name" />
+
+      <div class="game-mode">
+        <select id="game-mode">
+          <option value="single">Single Player</option>
+          <option value="multi">Multiplayer</option>
+        </select>
+      </div>
+
+      <div class="host-container">
+        <label>
+          <input type="checkbox" id="is-host" /> Host
+        </label>
+      </div>
+
+      <button id="start-button">Start Game</button>
+    </div>
+  </div>
+
+
+
     <div>
       <div class="scores">
         <h1 id="score">000</h1>

@@ -83,3 +83,82 @@ body,
 #snake-logo {
   position: absolute;
 }
+
+/* Startmeny container */
+.menu-container {
+  background-color: rgba(0,0,0,0.7);
+  padding: 50px 60px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Titel */
+.menu-container h1 {
+  font-size: 50px;
+  margin-bottom: 40px;
+  color: #f2c14e;
+  text-shadow: 2px 2px #222;
+}
+
+/* Textfält */
+.menu-container input[type="text"] {
+  padding: 15px;
+  width: 250px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Dropdown */
+.menu-container select {
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  width: 200px;
+  border: none;
+  text-align: center;
+}
+
+/* Checkbox */
+.host-container {
+  margin-bottom: 30px;
+  font-size: 18px;
+  color: #fff;
+}
+
+/* Startknapp */
+#start-button {
+  padding: 15px 50px;
+  font-size: 22px;
+  border: none;
+  border-radius: 15px;
+  background-color: #f2c14e;
+  color: #222;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#start-button:hover {
+  background-color: #e0b53a;
+  transform: scale(1.05);
+}
+
+#start-menu {
+  display: flex;          
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7); 
+  z-index: 100;            
+}
+
+#game-container {
+  display: none;           
+}
