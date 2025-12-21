@@ -15,7 +15,7 @@ const playerNameInput = document.getElementById("player-name");
 const playerDisplay = document.getElementById("player-display");
 const newRecordMsg = document.getElementById("new-record-msg");
 
-// Skapa en container för fyrverkerier
+// Skapa container för fyrverkerier
 let fireworksContainer = document.createElement("div");
 fireworksContainer.id = "fireworks-container";
 document.body.appendChild(fireworksContainer);
@@ -32,8 +32,8 @@ function showNewRecordMessage(playerName) {
   newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
   newRecordMsg.style.display = "block";
 
-  // Fyrverkeri-animation
-  showFireworks();
+  // Spela upp fyrverkerier 3 gånger med blink och färg
+  playFireworksMultiple(3, 700);
 
   // Dölj meddelandet efter 6 sekunder
   setTimeout(() => {
@@ -41,12 +41,22 @@ function showNewRecordMessage(playerName) {
   }, 6000);
 }
 
+// Spela upp fyrverkerier flera gånger
+function playFireworksMultiple(times, interval) {
+  let count = 0;
+  const fireworkInterval = setInterval(() => {
+    showFireworks();
+    count++;
+    if (count >= times) clearInterval(fireworkInterval);
+  }, interval);
+}
+
 // Skapa fyrverkerier över hela skärmen
 function showFireworks() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  for (let i = 0; i < 50; i++) { // fler partiklar för bättre effekt
+  for (let i = 0; i < 50; i++) {
     const particle = document.createElement("div");
     particle.classList.add("firework");
 
@@ -60,8 +70,11 @@ function showFireworks() {
     particle.style.setProperty("--x", x);
     particle.style.setProperty("--y", y);
 
-    const colors = ["#f2c14e", "#e63946", "#a8dadc", "#457b9d"];
+    // Slumpmässig färg och blink-animation
+    const colors = ["#f2c14e", "#e63946", "#a8dadc", "#457b9d", "#ff6b6b", "#ffb400"];
     particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.animationDuration = `${0.8 + Math.random() * 0.5}s`;
+    particle.style.opacity = Math.random();
 
     fireworksContainer.appendChild(particle);
 
