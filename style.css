@@ -176,4 +176,38 @@ body,
   color: #f2c14e;
   margin-bottom: 10px;
   display: none; 
+
+
+}
+/* Fyrverkeri-container täcker hela skärmen */
+#fireworks-container {
+  position: fixed; /* fixed för att täcka hela skärmen oavsett scroll */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* klick går igenom */
+  overflow: visible;
+  z-index: 200; /* ovanpå allt annat */
+}
+
+/* Enskild fyrverkeripartikel */
+.firework {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: explode 3s ease-out forwards;
+}
+
+/* Animation för explosion */
+@keyframes explode {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5) translate(var(--x), var(--y));
+    opacity: 0;
+  }
 }

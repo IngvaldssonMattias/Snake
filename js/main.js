@@ -15,6 +15,11 @@ const playerNameInput = document.getElementById("player-name");
 const playerDisplay = document.getElementById("player-display");
 const newRecordMsg = document.getElementById("new-record-msg");
 
+// Skapa en container för fyrverkerier
+let fireworksContainer = document.createElement("div");
+fireworksContainer.id = "fireworks-container";
+document.body.appendChild(fireworksContainer);
+
 // Instanser av renderer och spel
 const renderer = new GameRenderer(board, scoreEl, highScoreEl);
 const game = new SnakeGame(20);
@@ -27,13 +32,46 @@ function showNewRecordMessage(playerName) {
   newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
   newRecordMsg.style.display = "block";
 
-  // Dölj meddelandet efter 3 sekunder
+  // Fyrverkeri-animation
+  showFireworks();
+
+  // Dölj meddelandet efter 6 sekunder
   setTimeout(() => {
     newRecordMsg.style.display = "none";
   }, 6000);
 }
 
-// Rita spelet (ormen syns bara när spelet startat)
+// Skapa fyrverkerier över hela skärmen
+function showFireworks() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  for (let i = 0; i < 50; i++) { // fler partiklar för bättre effekt
+    const particle = document.createElement("div");
+    particle.classList.add("firework");
+
+    // Slumpmässig startposition
+    particle.style.left = Math.random() * vw + "px";
+    particle.style.top = Math.random() * vh + "px";
+
+    // Slumpmässig spridning
+    const x = (Math.random() - 0.5) * 300 + "px";
+    const y = (Math.random() - 0.5) * 300 + "px";
+    particle.style.setProperty("--x", x);
+    particle.style.setProperty("--y", y);
+
+    const colors = ["#f2c14e", "#e63946", "#a8dadc", "#457b9d"];
+    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+    fireworksContainer.appendChild(particle);
+
+    particle.addEventListener("animationend", () => {
+      particle.remove();
+    });
+  }
+}
+
+// Rita spelet
 function draw() {
   renderer.clearBoard();
   if (gameStarted) {
@@ -48,11 +86,10 @@ function gameLoop() {
   const head = game.move();
 
   if (game.hasCollision(head)) {
-    const previousHighScore = game.highScore; // spara tidigare highscore
+    const previousHighScore = game.highScore;
     game.updateHighScore();
     renderer.updateHighScore(game.highScore);
 
-    // Om nytt rekord slås
     if (game.highScore > previousHighScore) {
       const playerName = playerNameInput.value.trim() || "Player";
       showNewRecordMessage(playerName);
@@ -65,17 +102,16 @@ function gameLoop() {
   }
 
   draw();
-
-  // Dynamisk hastighet
   clearInterval(gameInterval);
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
 
-// Starta själva spelet (första gången ormen rör sig)
+// Starta spelet när space trycks
 function beginPlaying() {
   gameStarted = true;
   instructionText.style.display = "none";
   logo.style.display = "none";
+  newRecordMsg.style.display = "none";
   draw();
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
@@ -89,15 +125,15 @@ function stopGame() {
   draw();
 }
 
-// När man klickar på Start Game-knappen
+// Startknapp
 startButton.addEventListener("click", () => {
   if (gameModeSelect.value === "single") {
     const playerName = playerNameInput.value.trim() || "Player";
-    playerDisplay.textContent = playerName; // Visa namn ovanför spelplanen
+    playerDisplay.textContent = playerName;
 
-    startMenu.style.display = "none";      // Dölj startmenyn
-    gameContainer.style.display = "block"; // Visa spelplanen
-    instructionText.textContent = "Press spacebar to start the game"; // Visa instruktion
+    startMenu.style.display = "none";
+    gameContainer.style.display = "block";
+    instructionText.textContent = "Press spacebar to start the game";
     instructionText.style.display = "block";
     logo.style.display = "block";
   } else {
@@ -105,14 +141,13 @@ startButton.addEventListener("click", () => {
   }
 });
 
-// Lyssna på tangenttryck
+// Tangenttryck
 document.addEventListener("keydown", e => {
   if (!gameStarted && (e.code === "Space" || e.key === " ")) {
-    beginPlaying(); // Starta spelet först när space trycks
+    beginPlaying();
     return;
   }
 
-  // Riktning (förhindra 180°-vändning)
   switch (e.key) {
     case "ArrowUp": if (game.direction !== "down") game.direction = "up"; break;
     case "ArrowDown": if (game.direction !== "up") game.direction = "down"; break;
@@ -121,5 +156,5 @@ document.addEventListener("keydown", e => {
   }
 });
 
-// Visa highscore direkt när sidan laddas
+// Visa highscore direkt
 renderer.updateHighScore(game.highScore);
