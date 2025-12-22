@@ -248,14 +248,13 @@ function gameLoop() {
 ========================= */
 function beginPlaying() {
   gameStarted = true;
-  instructionText.style.display = "none";
-  logo.style.display = "none";
   newRecordMsg.style.display = "none";
 
-  // Visa hela spelplanen och bakgrunden
   gameContainer.style.display = "block";
   gameContainer.style.visibility = "visible";
   board.classList.remove("hide-background");
+
+  
 
   draw();
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
@@ -265,7 +264,7 @@ function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = "block";
-  logo.style.display = "block";
+   logo.style.display = "block";
 }
 
 /* =========================
@@ -278,7 +277,6 @@ startButton.addEventListener("click", () => {
   if (gameModeSelect.value === "multi") {
     multiplayerModal.classList.remove("hidden");
 
-    // Dölj startmenyn + hela spelplanen
     startMenu.style.display = "none";
     gameContainer.style.display = "none";
     gameContainer.style.visibility = "hidden";
@@ -286,7 +284,6 @@ startButton.addEventListener("click", () => {
     instructionText.style.display = "none";
     playerDisplay.style.display = "none";
 
-    // Dölj bakgrund
     board.classList.add("hide-background");
 
   } else {
@@ -294,6 +291,9 @@ startButton.addEventListener("click", () => {
     gameContainer.style.display = "block";
     gameContainer.style.visibility = "visible";
     board.classList.remove("hide-background");
+
+    // Visa logon EN gång innan man trycker Space
+    logo.style.display = "block";
   }
 });
 
@@ -307,7 +307,8 @@ closeModalBtn.addEventListener("click", () => {
   gameContainer.style.display = "none";
   gameContainer.style.visibility = "hidden";
   board.classList.add("hide-background");
-  logo.style.display = "block";
+
+  logo.style.display = "none";  // DÖLJ logon även här
   instructionText.style.display = "block";
   playerDisplay.style.display = "block";
 });
@@ -316,7 +317,15 @@ closeModalBtn.addEventListener("click", () => {
    Keyboard
 ========================= */
 document.addEventListener("keydown", (e) => {
-  if (!gameStarted && (e.code === "Space" || e.key === " ")) beginPlaying();
+  if (!gameStarted && (e.code === "Space" || e.key === " ")) {
+    // ✅ Dölj instruktionstexten exakt när Space trycks
+    instructionText.style.display = "none";
+
+    beginPlaying();
+
+    // Döljer logon när spelet startar
+    logo.style.display = "none";
+  }
   if (e.key === "ArrowUp" && game.direction !== "down") game.direction = "up";
   if (e.key === "ArrowDown" && game.direction !== "up") game.direction = "down";
   if (e.key === "ArrowLeft" && game.direction !== "right") game.direction = "left";
@@ -326,8 +335,6 @@ document.addEventListener("keydown", (e) => {
 /* =========================
    Init
 ========================= */
-// Dölj bakgrund och spelplan direkt vid start
 board.classList.add("hide-background");
-gameContainer.style.display = "none";
 gameContainer.style.visibility = "hidden";
 renderer.updateHighScore(game.highScore);

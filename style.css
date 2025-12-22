@@ -28,7 +28,7 @@ body,
   border: #abb78a solid 8px;
   border-radius: 26px;
   box-shadow: inset 0 0 0 10px #abb78a;
-}
+} 
 .game-border-3 {
   border: #8b966c solid 30px;
   border-radius: 20px;
@@ -344,7 +344,6 @@ body,
 
 /* Dölj allt i bakgrunden när startmenyn är uppe */
 #start-menu ~ #game-container,
-#start-menu ~ #instruction-text,
 #start-menu ~ #snake-logo {
   display: none; /* Inget bakom startmenyn ska synas */
 }
