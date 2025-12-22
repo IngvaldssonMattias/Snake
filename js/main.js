@@ -59,11 +59,12 @@ let gravityDirection = 1;
 let waveCount = 0;
 let waveLocked = false;
 
+const COLORS = ["#f2c14e", "#e63946", "#a8dadc", "#457b9d", "#ff6b6b", "#ffb400"];
+
 /* =========================
    Confetti creation
 ========================= */
 function createConfetti() {
-  const colors = ["#f2c14e","#e63946","#a8dadc","#457b9d","#ff6b6b","#ffb400"];
   confetti = [];
   for (let i = 0; i < CONFETTI_COUNT; i++) {
     confetti.push({
@@ -74,30 +75,54 @@ function createConfetti() {
       size: 6 + Math.random() * 4,
       rotation: Math.random() * 360,
       vr: (Math.random() - 0.5) * 6,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
     });
   }
 }
 
 /* =========================
-   Fyrverkerier
+   Confetti-puff
+========================= */
+function createConfettiPuff(x, y) {
+  const PUFF_COUNT = 20;
+  for (let i = 0; i < PUFF_COUNT; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 6 + 3;
+    confetti.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: 5 + Math.random() * 3,
+      rotation: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 10,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    });
+  }
+}
+
+/* =========================
+   Fyrverkerier + puff
 ========================= */
 function showFireworks() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const colors = ["#f2c14e","#e63946","#a8dadc","#457b9d","#ff6b6b","#ffb400"];
+  const cx = Math.random() * vw;
+  const cy = Math.random() * vh * 0.6;
 
   for (let i = 0; i < 30; i++) {
     const p = document.createElement("div");
     p.classList.add("firework");
-    p.style.left = Math.random() * vw + "px";
-    p.style.top = Math.random() * vh + "px";
-    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.left = cx + "px";
+    p.style.top = cy + "px";
+    p.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
     p.style.setProperty("--x", (Math.random() - 0.5) * 500 + "px");
     p.style.setProperty("--y", (Math.random() - 0.5) * 500 + "px");
     fireworksContainer.appendChild(p);
     p.addEventListener("animationend", () => p.remove());
   }
+
+  createConfettiPuff(cx, cy);
 }
 
 /* =========================
@@ -107,18 +132,16 @@ function updateConfetti() {
   if (!confettiActive) return;
 
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-
   let countInZone = 0;
+
   confetti.forEach(p => {
     p.vy += GRAVITY * gravityDirection;
     p.x += p.vx;
     p.y += p.vy;
     p.rotation += p.vr;
 
-    if (
-      (gravityDirection === 1 && p.y > confettiCanvas.height * 0.75) ||
-      (gravityDirection === -1 && p.y < confettiCanvas.height * 0.25)
-    ) {
+    if ((gravityDirection === 1 && p.y > confettiCanvas.height * 0.75) ||
+        (gravityDirection === -1 && p.y < confettiCanvas.height * 0.25)) {
       countInZone++;
     }
 
@@ -148,10 +171,9 @@ function updateConfetti() {
 }
 
 /* =========================
-   Celebration (FIXAD)
+   Celebration
 ========================= */
 function startCelebration() {
-  // Starta confetti EN gång
   waveCount = 0;
   confettiActive = true;
   gravityDirection = 1;
@@ -160,13 +182,11 @@ function startCelebration() {
   createConfetti();
   requestAnimationFrame(updateConfetti);
 
-  // Fyrverkerier körs parallellt
   let fireworkCount = 0;
   const interval = setInterval(() => {
     showFireworks();
-
     fireworkCount++;
-    if (fireworkCount >= 6) clearInterval(interval);
+    if (fireworkCount >= 15) clearInterval(interval);
   }, 500);
 }
 
@@ -231,6 +251,12 @@ function beginPlaying() {
   instructionText.style.display = "none";
   logo.style.display = "none";
   newRecordMsg.style.display = "none";
+
+  // Visa hela spelplanen och bakgrunden
+  gameContainer.style.display = "block";
+  gameContainer.style.visibility = "visible";
+  board.classList.remove("hide-background");
+
   draw();
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
@@ -242,25 +268,68 @@ function stopGame() {
   logo.style.display = "block";
 }
 
+/* =========================
+   Start-knapp
+========================= */
 startButton.addEventListener("click", () => {
   const name = playerNameInput.value.trim() || "Player";
   playerDisplay.textContent = name;
-  startMenu.style.display = "none";
-  gameContainer.style.display = "block";
+
+  if (gameModeSelect.value === "multi") {
+    multiplayerModal.classList.remove("hidden");
+
+    // Dölj startmenyn + hela spelplanen
+    startMenu.style.display = "none";
+    gameContainer.style.display = "none";
+    gameContainer.style.visibility = "hidden";
+    logo.style.display = "none";
+    instructionText.style.display = "none";
+    playerDisplay.style.display = "none";
+
+    // Dölj bakgrund
+    board.classList.add("hide-background");
+
+  } else {
+    startMenu.style.display = "none";
+    gameContainer.style.display = "block";
+    gameContainer.style.visibility = "visible";
+    board.classList.remove("hide-background");
+  }
 });
 
 /* =========================
-   Multiplayer modal logic
+   Multiplayer modal
 ========================= */
 gameModeSelect.addEventListener("change", () => {
   if (gameModeSelect.value === "multi") {
+    startMenu.style.display = "none";
+    gameContainer.style.display = "none";
+    gameContainer.style.visibility = "hidden";
+    logo.style.display = "none";
+    instructionText.style.display = "none";
+    playerDisplay.style.display = "none";
+
     multiplayerModal.classList.remove("hidden");
-    gameModeSelect.value = "single";
+    board.classList.add("hide-background");
+  } else {
+    multiplayerModal.classList.add("hidden");
+    startMenu.style.display = "flex";
+    gameContainer.style.display = "none";
+    gameContainer.style.visibility = "hidden";
+    logo.style.display = "block";
+    instructionText.style.display = "block";
+    playerDisplay.style.display = "block";
+    board.classList.add("hide-background");
   }
 });
 
 closeModalBtn.addEventListener("click", () => {
   multiplayerModal.classList.add("hidden");
+
+  startMenu.style.display = "flex";
+  gameContainer.style.display = "none";
+  gameContainer.style.visibility = "hidden";
+  board.classList.add("hide-background");
 });
 
 /* =========================
@@ -277,4 +346,7 @@ document.addEventListener("keydown", (e) => {
 /* =========================
    Init
 ========================= */
+// Dölj bakgrund och spelplan direkt vid start
+board.classList.add("hide-background");
+gameContainer.style.visibility = "hidden";
 renderer.updateHighScore(game.highScore);

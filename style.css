@@ -161,8 +161,10 @@ body,
 }
 
 #game-container {
-  display: none;
+  display: none; /* redan finns */
+  visibility: hidden; /* lägg till så att ingenting syns bakom startmenyn */
 }
+
 
 /* Player name display ovanför spelplanen */
 #player-display {
@@ -284,13 +286,14 @@ body,
   display: none;
 }
 
+/* ===== Modal ===== */
 .modal-content {
-  background: #111;
-  border: 4px solid #00ff88;
+  background: rgba(0, 0, 0, 0.7); /* som menyn */
+  border: 4px solid #f2c14e;     /* samma som startknapp/färg i menyn */
   padding: 30px 40px;
   text-align: center;
-  color: #00ff88;
-  box-shadow: 0 0 20px #00ff88;
+  color: #f2c14e;                 /* textfärg som menyn */
+  box-shadow: 0 0 20px #f2c14e;   /* samma accentfärg */
   animation: popIn 0.3s ease-out;
 }
 
@@ -309,8 +312,13 @@ body,
   font-size: 20px;
   padding: 8px 20px;
   cursor: pointer;
-  background: #00ff88;
+  background: #f2c14e; /* samma som startknappen */
   border: none;
+  color: #222;         /* som startknappen */
+}
+.modal-content button:hover {
+  background-color: #e0b53a; /* hover-effekt som startknappen */
+  transform: scale(1.05);
 }
 
 @keyframes popIn {
@@ -322,4 +330,21 @@ body,
     transform: scale(1);
     opacity: 1;
   }
+}
+/* Dölj bakgrund när startmenyn visas */
+#game-board.hide-background {
+  background-image: none; /* Tar bort bakgrundsbilden */
+  background-color: transparent; /* Om du har en färg, kan sättas till transparent */
+}
+
+/* Valfritt: gör att hela spelområdet inte syns */
+#game-board.hide-background * {
+  display: none; /* Dölj innehållet i spelplanen */
+}
+
+/* Dölj allt i bakgrunden när startmenyn är uppe */
+#start-menu ~ #game-container,
+#start-menu ~ #instruction-text,
+#start-menu ~ #snake-logo {
+  display: none; /* Inget bakom startmenyn ska synas */
 }
