@@ -1,7 +1,9 @@
 import { GameRenderer } from "./component/component.js";
 import { SnakeGame } from "./service/service.js";
 
-// HTML-element
+/* =========================
+   HTML-element
+========================= */
 const board = document.getElementById("game-board");
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("highScore");
@@ -10,89 +12,185 @@ const logo = document.getElementById("snake-logo");
 const startMenu = document.getElementById("start-menu");
 const gameContainer = document.getElementById("game-container");
 const startButton = document.getElementById("start-button");
-const gameModeSelect = document.getElementById("game-mode");
 const playerNameInput = document.getElementById("player-name");
 const playerDisplay = document.getElementById("player-display");
 const newRecordMsg = document.getElementById("new-record-msg");
+const gameModeSelect = document.getElementById("game-mode");
 
-// Skapa container för fyrverkerier
-let fireworksContainer = document.createElement("div");
-fireworksContainer.id = "fireworks-container";
-document.body.appendChild(fireworksContainer);
+/* =========================
+   Multiplayer modal
+========================= */
+const multiplayerModal = document.getElementById("multiplayer-modal");
+const closeModalBtn = document.getElementById("close-modal");
 
-// Instanser av renderer och spel
-const renderer = new GameRenderer(board, scoreEl, highScoreEl);
-const game = new SnakeGame(20);
+/* =========================
+   Fyrverkeri container
+========================= */
+const fireworksContainer = document.getElementById("fireworks-container");
 
-let gameInterval = null;
-let gameStarted = false;
+/* =========================
+   Confetti canvas
+========================= */
+const confettiCanvas = document.createElement("canvas");
+confettiCanvas.id = "confetti-canvas";
+confettiCanvas.style.position = "fixed";
+confettiCanvas.style.inset = "0";
+confettiCanvas.style.pointerEvents = "none";
+confettiCanvas.style.zIndex = "9998";
+document.body.appendChild(confettiCanvas);
 
-// Funktion för att visa nytt rekord-meddelande
-function showNewRecordMessage(playerName) {
-  newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
-  newRecordMsg.style.display = "block";
+const ctx = confettiCanvas.getContext("2d");
 
-  // Spela upp fyrverkerier 3 gånger med blink och färg
-  playFireworksMultiple(3, 700);
-
-  // Dölj meddelandet efter 6 sekunder
-  setTimeout(() => {
-    newRecordMsg.style.display = "none";
-  }, 6000);
+function resizeCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
 }
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-// Spela upp fyrverkerier flera gånger
-function playFireworksMultiple(times, interval) {
-  let count = 0;
-  const fireworkInterval = setInterval(() => {
-    showFireworks();
-    count++;
-    if (count >= times) clearInterval(fireworkInterval);
-  }, interval);
-}
+/* =========================
+   Confetti settings
+========================= */
+const CONFETTI_COUNT = 120;
+const GRAVITY = 0.0875;
+let confetti = [];
+let confettiActive = false;
+let gravityDirection = 1;
+let waveCount = 0;
+let waveLocked = false;
 
-// Skapa fyrverkerier över hela skärmen
-function showFireworks() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-
-  for (let i = 0; i < 50; i++) {
-    const particle = document.createElement("div");
-    particle.classList.add("firework");
-
-    // Slumpmässig startposition
-    particle.style.left = Math.random() * vw + "px";
-    particle.style.top = Math.random() * vh + "px";
-
-    // Slumpmässig spridning
-    const x = (Math.random() - 0.5) * 300 + "px";
-    const y = (Math.random() - 0.5) * 300 + "px";
-    particle.style.setProperty("--x", x);
-    particle.style.setProperty("--y", y);
-
-    // Slumpmässig färg och blink-animation
-    const colors = [
-      "#f2c14e",
-      "#e63946",
-      "#a8dadc",
-      "#457b9d",
-      "#ff6b6b",
-      "#ffb400",
-    ];
-    particle.style.backgroundColor =
-      colors[Math.floor(Math.random() * colors.length)];
-    particle.style.animationDuration = `${0.8 + Math.random() * 0.5}s`;
-    particle.style.opacity = Math.random();
-
-    fireworksContainer.appendChild(particle);
-
-    particle.addEventListener("animationend", () => {
-      particle.remove();
+/* =========================
+   Confetti creation
+========================= */
+function createConfetti() {
+  const colors = ["#f2c14e","#e63946","#a8dadc","#457b9d","#ff6b6b","#ffb400"];
+  confetti = [];
+  for (let i = 0; i < CONFETTI_COUNT; i++) {
+    confetti.push({
+      x: Math.random() * confettiCanvas.width,
+      y: Math.random() * -300,
+      vx: (Math.random() - 0.5) * 2,
+      vy: Math.random() * 0.5 + 0.5,
+      size: 6 + Math.random() * 4,
+      rotation: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
     });
   }
 }
 
-// Rita spelet
+/* =========================
+   Fyrverkerier
+========================= */
+function showFireworks() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const colors = ["#f2c14e","#e63946","#a8dadc","#457b9d","#ff6b6b","#ffb400"];
+
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement("div");
+    p.classList.add("firework");
+    p.style.left = Math.random() * vw + "px";
+    p.style.top = Math.random() * vh + "px";
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.setProperty("--x", (Math.random() - 0.5) * 500 + "px");
+    p.style.setProperty("--y", (Math.random() - 0.5) * 500 + "px");
+    fireworksContainer.appendChild(p);
+    p.addEventListener("animationend", () => p.remove());
+  }
+}
+
+/* =========================
+   Confetti animation
+========================= */
+function updateConfetti() {
+  if (!confettiActive) return;
+
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+  let countInZone = 0;
+  confetti.forEach(p => {
+    p.vy += GRAVITY * gravityDirection;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rotation += p.vr;
+
+    if (
+      (gravityDirection === 1 && p.y > confettiCanvas.height * 0.75) ||
+      (gravityDirection === -1 && p.y < confettiCanvas.height * 0.25)
+    ) {
+      countInZone++;
+    }
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    ctx.restore();
+  });
+
+  if (!waveLocked && countInZone > confetti.length * 0.6) {
+    gravityDirection *= -1;
+    waveCount++;
+    waveLocked = true;
+    confetti.forEach(p => (p.vy *= -0.7));
+    setTimeout(() => (waveLocked = false), 600);
+  }
+
+  if (waveCount >= 5) {
+    confettiActive = false;
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    return;
+  }
+
+  requestAnimationFrame(updateConfetti);
+}
+
+/* =========================
+   Celebration (FIXAD)
+========================= */
+function startCelebration() {
+  // Starta confetti EN gång
+  waveCount = 0;
+  confettiActive = true;
+  gravityDirection = 1;
+  waveLocked = false;
+
+  createConfetti();
+  requestAnimationFrame(updateConfetti);
+
+  // Fyrverkerier körs parallellt
+  let fireworkCount = 0;
+  const interval = setInterval(() => {
+    showFireworks();
+
+    fireworkCount++;
+    if (fireworkCount >= 6) clearInterval(interval);
+  }, 500);
+}
+
+/* =========================
+   Game setup
+========================= */
+const renderer = new GameRenderer(board, scoreEl, highScoreEl);
+const game = new SnakeGame(20);
+let gameInterval = null;
+let gameStarted = false;
+
+/* =========================
+   New record
+========================= */
+function showNewRecordMessage(playerName) {
+  newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
+  newRecordMsg.style.display = "block";
+  startCelebration();
+  setTimeout(() => (newRecordMsg.style.display = "none"), 6000);
+}
+
+/* =========================
+   Draw & loop
+========================= */
 function draw() {
   renderer.clearBoard();
   if (gameStarted) {
@@ -102,18 +200,16 @@ function draw() {
   }
 }
 
-// Huvudloop för spelet
 function gameLoop() {
   const head = game.move();
-
   if (game.hasCollision(head)) {
-    const previousHighScore = game.highScore;
+    const prevHigh = game.highScore;
     game.updateHighScore();
     renderer.updateHighScore(game.highScore);
 
-    if (game.highScore > previousHighScore) {
-      const playerName = playerNameInput.value.trim() || "Player";
-      showNewRecordMessage(playerName);
+    if (game.highScore > prevHigh) {
+      const name = playerNameInput.value.trim() || "Player";
+      showNewRecordMessage(name);
     }
 
     stopGame();
@@ -127,7 +223,9 @@ function gameLoop() {
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
 
-// Starta spelet när space trycks
+/* =========================
+   Controls
+========================= */
 function beginPlaying() {
   gameStarted = true;
   instructionText.style.display = "none";
@@ -137,53 +235,46 @@ function beginPlaying() {
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
 }
 
-// Stoppa spelet
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
   instructionText.style.display = "block";
   logo.style.display = "block";
-  draw();
 }
 
-// Startknapp
 startButton.addEventListener("click", () => {
-  if (gameModeSelect.value === "single") {
-    const playerName = playerNameInput.value.trim() || "Player";
-    playerDisplay.textContent = playerName;
+  const name = playerNameInput.value.trim() || "Player";
+  playerDisplay.textContent = name;
+  startMenu.style.display = "none";
+  gameContainer.style.display = "block";
+});
 
-    startMenu.style.display = "none";
-    gameContainer.style.display = "block";
-    instructionText.textContent = "Press spacebar to start the game";
-    instructionText.style.display = "block";
-    logo.style.display = "block";
-  } else {
-    alert("Multiplayer är inte implementerat än.");
+/* =========================
+   Multiplayer modal logic
+========================= */
+gameModeSelect.addEventListener("change", () => {
+  if (gameModeSelect.value === "multi") {
+    multiplayerModal.classList.remove("hidden");
+    gameModeSelect.value = "single";
   }
 });
 
-// Tangenttryck
+closeModalBtn.addEventListener("click", () => {
+  multiplayerModal.classList.add("hidden");
+});
+
+/* =========================
+   Keyboard
+========================= */
 document.addEventListener("keydown", (e) => {
-  if (!gameStarted && (e.code === "Space" || e.key === " ")) {
-    beginPlaying();
-    return;
-  }
-
-  switch (e.key) {
-    case "ArrowUp":
-      if (game.direction !== "down") game.direction = "up";
-      break;
-    case "ArrowDown":
-      if (game.direction !== "up") game.direction = "down";
-      break;
-    case "ArrowLeft":
-      if (game.direction !== "right") game.direction = "left";
-      break;
-    case "ArrowRight":
-      if (game.direction !== "left") game.direction = "right";
-      break;
-  }
+  if (!gameStarted && (e.code === "Space" || e.key === " ")) beginPlaying();
+  if (e.key === "ArrowUp" && game.direction !== "down") game.direction = "up";
+  if (e.key === "ArrowDown" && game.direction !== "up") game.direction = "down";
+  if (e.key === "ArrowLeft" && game.direction !== "right") game.direction = "left";
+  if (e.key === "ArrowRight" && game.direction !== "left") game.direction = "right";
 });
 
-// Visa highscore direkt
+/* =========================
+   Init
+========================= */
 renderer.updateHighScore(game.highScore);

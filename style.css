@@ -193,11 +193,13 @@ body,
 /* Fyrverkeripartiklar */
 .firework {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  opacity: 0;
-  animation: explode 1s ease-out forwards, blink 0.5s infinite alternate;
+  background: #ff0; /* defaultfärg om JS misslyckas */
+  opacity: 1;       /* start synlig */
+  animation: explode 3s ease-out forwards, blink 4s infinite alternate;
+  animation-delay: 0.3s; /* Lägger till fördröjning på varje fyrverkeripartikel */
 }
 
 /* Explosionseffekt */
@@ -221,6 +223,103 @@ body,
     opacity: 0.3;
   }
   100% {
+    opacity: 1;
+  }
+}
+
+/* Confetti Canvas */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Confetti Particles */
+.confetti {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 1;
+  animation: confettiFall 3s ease-in-out forwards, confettiBounce 2s ease-out infinite;
+}
+
+/* Confetti fall animation */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-300px);
+  }
+  100% {
+    transform: translateY(calc(100vh + 50px));
+  }
+}
+
+/* Confetti bounce effect */
+@keyframes confettiBounce {
+  0% {
+    transform: translateY(-20px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ===== Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-family: "VT323", monospace;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #111;
+  border: 4px solid #00ff88;
+  padding: 30px 40px;
+  text-align: center;
+  color: #00ff88;
+  box-shadow: 0 0 20px #00ff88;
+  animation: popIn 0.3s ease-out;
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+  font-size: 36px;
+}
+
+.modal-content p {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.modal-content button {
+  font-family: inherit;
+  font-size: 20px;
+  padding: 8px 20px;
+  cursor: pointer;
+  background: #00ff88;
+  border: none;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
     opacity: 1;
   }
 }
