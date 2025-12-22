@@ -300,29 +300,6 @@ startButton.addEventListener("click", () => {
 /* =========================
    Multiplayer modal
 ========================= */
-gameModeSelect.addEventListener("change", () => {
-  if (gameModeSelect.value === "multi") {
-    startMenu.style.display = "none";
-    gameContainer.style.display = "none";
-    gameContainer.style.visibility = "hidden";
-    logo.style.display = "none";
-    instructionText.style.display = "none";
-    playerDisplay.style.display = "none";
-
-    multiplayerModal.classList.remove("hidden");
-    board.classList.add("hide-background");
-  } else {
-    multiplayerModal.classList.add("hidden");
-    startMenu.style.display = "flex";
-    gameContainer.style.display = "none";
-    gameContainer.style.visibility = "hidden";
-    logo.style.display = "block";
-    instructionText.style.display = "block";
-    playerDisplay.style.display = "block";
-    board.classList.add("hide-background");
-  }
-});
-
 closeModalBtn.addEventListener("click", () => {
   multiplayerModal.classList.add("hidden");
 
@@ -330,6 +307,9 @@ closeModalBtn.addEventListener("click", () => {
   gameContainer.style.display = "none";
   gameContainer.style.visibility = "hidden";
   board.classList.add("hide-background");
+  logo.style.display = "block";
+  instructionText.style.display = "block";
+  playerDisplay.style.display = "block";
 });
 
 /* =========================
@@ -348,5 +328,6 @@ document.addEventListener("keydown", (e) => {
 ========================= */
 // Dölj bakgrund och spelplan direkt vid start
 board.classList.add("hide-background");
+gameContainer.style.display = "none";
 gameContainer.style.visibility = "hidden";
 renderer.updateHighScore(game.highScore);
