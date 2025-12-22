@@ -1,6 +1,7 @@
 import { GameRenderer } from "./component/component.js";
 import { SnakeGame } from "./service/service.js";
 import { celebration } from "./utils/celebration.js";
+import { UI } from "./utils/ui.js";
 
 /* =========================
    HTML-element
@@ -17,7 +18,6 @@ const playerNameInput = document.getElementById("player-name");
 const playerDisplay = document.getElementById("player-display");
 const newRecordMsg = document.getElementById("new-record-msg");
 const gameModeSelect = document.getElementById("game-mode");
-
 const multiplayerModal = document.getElementById("multiplayer-modal");
 const closeModalBtn = document.getElementById("close-modal");
 
@@ -51,7 +51,8 @@ function gameLoop() {
 
     if (game.highScore > prevHigh) {
       const name = playerNameInput.value.trim() || "Player";
-      showNewRecordMessage(name);
+      UI.showNewRecordMessage(newRecordMsg, name);
+      celebration.startCelebration();
     }
 
     stopGame();
@@ -71,9 +72,7 @@ function gameLoop() {
 function beginPlaying() {
   gameStarted = true;
   newRecordMsg.style.display = "none";
-  gameContainer.style.display = "block";
-  gameContainer.style.visibility = "visible";
-  board.classList.remove("hide-background");
+  UI.showGame(gameContainer, board);
 
   draw();
   gameInterval = setInterval(gameLoop, game.gameSpeedDelay);
@@ -82,18 +81,7 @@ function beginPlaying() {
 function stopGame() {
   clearInterval(gameInterval);
   gameStarted = false;
-  instructionText.style.display = "block";
-  logo.style.display = "block";
-}
-
-/* =========================
-   New record message
-========================= */
-function showNewRecordMessage(playerName) {
-  newRecordMsg.textContent = `Grattis ${playerName}! Du har slagit nytt rekord!`;
-  newRecordMsg.style.display = "block";
-  celebration.startCelebration();
-  setTimeout(() => (newRecordMsg.style.display = "none"), 6000);
+  UI.showStartScreen(instructionText, logo);
 }
 
 /* =========================
@@ -104,23 +92,17 @@ startButton.addEventListener("click", () => {
   playerDisplay.textContent = name;
 
   if (gameModeSelect.value === "multi") {
-    multiplayerModal.classList.remove("hidden");
-
-    startMenu.style.display = "none";
-    gameContainer.style.display = "none";
-    gameContainer.style.visibility = "hidden";
-    logo.style.display = "none";
-    instructionText.style.display = "none";
-    playerDisplay.style.display = "none";
-
-    board.classList.add("hide-background");
-
+    UI.showMultiplayerModal(
+      multiplayerModal,
+      startMenu,
+      gameContainer,
+      board,
+      logo,
+      instructionText,
+      playerDisplay
+    );
   } else {
-    startMenu.style.display = "none";
-    gameContainer.style.display = "block";
-    gameContainer.style.visibility = "visible";
-    board.classList.remove("hide-background");
-    logo.style.display = "block";
+    UI.showSinglePlayer(startMenu, gameContainer, board, logo);
   }
 });
 
@@ -128,16 +110,15 @@ startButton.addEventListener("click", () => {
    Multiplayer modal
 ========================= */
 closeModalBtn.addEventListener("click", () => {
-  multiplayerModal.classList.add("hidden");
-
-  startMenu.style.display = "flex";
-  gameContainer.style.display = "none";
-  gameContainer.style.visibility = "hidden";
-  board.classList.add("hide-background");
-
-  logo.style.display = "none";
-  instructionText.style.display = "block";
-  playerDisplay.style.display = "block";
+  UI.hideMultiplayerModal(
+    multiplayerModal,
+    startMenu,
+    gameContainer,
+    board,
+    logo,
+    instructionText,
+    playerDisplay
+  );
 });
 
 /* =========================
@@ -145,7 +126,7 @@ closeModalBtn.addEventListener("click", () => {
 ========================= */
 document.addEventListener("keydown", (e) => {
   if (!gameStarted && (e.code === "Space" || e.key === " ")) {
-    instructionText.style.display = "none";
+    UI.hideInstructionText(instructionText);
     beginPlaying();
     logo.style.display = "none";
   }
@@ -159,6 +140,5 @@ document.addEventListener("keydown", (e) => {
 /* =========================
    Init
 ========================= */
-board.classList.add("hide-background");
-gameContainer.style.visibility = "hidden";
+UI.init(board, gameContainer);
 renderer.updateHighScore(game.highScore);
