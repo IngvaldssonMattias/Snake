@@ -15,59 +15,51 @@
     <script type="module" src="./js/main.js" defer></script>
   </head>
   <body>
+    <!-- STARTMENY -->
+    <div id="start-menu">
+      <div class="menu-container">
+        <h1>Snake Game</h1>
 
-  <!-- STARTMENY -->
-  <div id="start-menu">
-    <div class="menu-container">
-      <h1>Snake Game</h1>
-      
-      <input type="text" id="player-name" placeholder="Enter name" />
+        <input type="text" id="player-name" placeholder="Enter name" />
 
-      <div class="game-mode">
-        <select id="game-mode">
-          <option value="single">Single Player</option>
-          <option value="multi">Multiplayer</option>
-        </select>
+        <div class="game-mode">
+          <select id="game-mode">
+            <option value="single">Single Player</option>
+            <option value="multi">Multiplayer</option>
+          </select>
+        </div>
+
+        <div class="host-container">
+          <label> <input type="checkbox" id="is-host" /> Host </label>
+        </div>
+
+        <button id="start-button">Start Game</button>
       </div>
-
-      <div class="host-container">
-        <label>
-          <input type="checkbox" id="is-host" /> Host
-        </label>
-      </div>
-
-      <button id="start-button">Start Game</button>
-    </div>
-  </div>
-
-  <!-- SPELPLAN -->
-  <div id="game-container">
-    
-    <!-- Här lägger vi spelarens namn -->
-     <div id="fireworks-container"></div>
-    <div id="player-display"></div>
-    <div id="new-record-msg"></div>
-
-
-    <div class="scores">
-      <h1 id="score">000</h1>
-      <h1 id="highScore">000</h1>
     </div>
 
-    <div class="game-border-1">
-      <div class="game-border-2">
-        <div class="game-border-3">
-          <div id="game-board"></div>
+    <!-- SPELPLAN -->
+    <div id="game-container">
+      <!-- Här lägger vi spelarens namn -->
+      <div id="fireworks-container"></div>
+      <div id="player-display"></div>
+      <div id="new-record-msg"></div>
+
+      <div class="scores">
+        <h1 id="score">000</h1>
+        <h1 id="highScore">000</h1>
+      </div>
+
+      <div class="game-border-1">
+        <div class="game-border-2">
+          <div class="game-border-3">
+            <div id="game-board"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- INSTRUKTION & LOGO -->
-  <h1 id="instruction-text">Press spacebar to start the game</h1>
-  <img id="snake-logo" src="./image/snake.png" alt="snake-logo" />
-  
-</body>
-
-
+    <!-- INSTRUKTION & LOGO -->
+    <h1 id="instruction-text">Press spacebar to start the game</h1>
+    <img id="snake-logo" src="./image/snake.png" alt="snake-logo" />
+  </body>
 </html>

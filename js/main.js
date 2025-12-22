@@ -71,8 +71,16 @@ function showFireworks() {
     particle.style.setProperty("--y", y);
 
     // Slumpmässig färg och blink-animation
-    const colors = ["#f2c14e", "#e63946", "#a8dadc", "#457b9d", "#ff6b6b", "#ffb400"];
-    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    const colors = [
+      "#f2c14e",
+      "#e63946",
+      "#a8dadc",
+      "#457b9d",
+      "#ff6b6b",
+      "#ffb400",
+    ];
+    particle.style.backgroundColor =
+      colors[Math.floor(Math.random() * colors.length)];
     particle.style.animationDuration = `${0.8 + Math.random() * 0.5}s`;
     particle.style.opacity = Math.random();
 
@@ -155,17 +163,25 @@ startButton.addEventListener("click", () => {
 });
 
 // Tangenttryck
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", (e) => {
   if (!gameStarted && (e.code === "Space" || e.key === " ")) {
     beginPlaying();
     return;
   }
 
   switch (e.key) {
-    case "ArrowUp": if (game.direction !== "down") game.direction = "up"; break;
-    case "ArrowDown": if (game.direction !== "up") game.direction = "down"; break;
-    case "ArrowLeft": if (game.direction !== "right") game.direction = "left"; break;
-    case "ArrowRight": if (game.direction !== "left") game.direction = "right"; break;
+    case "ArrowUp":
+      if (game.direction !== "down") game.direction = "up";
+      break;
+    case "ArrowDown":
+      if (game.direction !== "up") game.direction = "down";
+      break;
+    case "ArrowLeft":
+      if (game.direction !== "right") game.direction = "left";
+      break;
+    case "ArrowRight":
+      if (game.direction !== "left") game.direction = "right";
+      break;
   }
 });
 

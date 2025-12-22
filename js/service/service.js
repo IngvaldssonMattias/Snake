@@ -18,10 +18,18 @@ export class SnakeGame {
     const head = { ...this.snake[0] };
 
     switch (this.direction) {
-      case "up": head.y--; break;
-      case "down": head.y++; break;
-      case "left": head.x--; break;
-      case "right": head.x++; break;
+      case "up":
+        head.y--;
+        break;
+      case "down":
+        head.y++;
+        break;
+      case "left":
+        head.x--;
+        break;
+      case "right":
+        head.x++;
+        break;
     }
 
     this.snake.unshift(head);
@@ -45,7 +53,12 @@ export class SnakeGame {
 
   hasCollision(head) {
     // Kollision med vägg
-    if (head.x < 1 || head.x > this.gridSize || head.y < 1 || head.y > this.gridSize) {
+    if (
+      head.x < 1 ||
+      head.x > this.gridSize ||
+      head.y < 1 ||
+      head.y > this.gridSize
+    ) {
       return true;
     }
 

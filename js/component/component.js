@@ -12,7 +12,7 @@ export class GameRenderer {
   }
 
   drawSnake(snake) {
-    snake.forEach(segment => {
+    snake.forEach((segment) => {
       const el = Utils.createGameElement("div", "snake");
       Utils.setPosition(el, segment);
       this.board.appendChild(el);
